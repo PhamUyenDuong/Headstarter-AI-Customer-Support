@@ -1,13 +1,13 @@
 'use client'
 import Image from "next/image";
-import {useState} from "react";
+import React, {useState} from "react";
 import {Box, Button, Stack, TextField} from '@mui/material'
-
+import ReactMarkdown from 'react-markdown'
 
 export default function Home() {
   const [messages, setMessages] = useState([{
     role: 'assistant',
-    content: `Hi! I will be assisting you with any of your questions about our cars and dealership.`
+    content: `Hi, I'm Carl! I will be assisting you with any of your questions about our cars and dealership.`
   },
 ])
   const [message, setMessage] = useState('')
@@ -53,51 +53,87 @@ export default function Home() {
 
   return(
     <Box 
-      width = "100vw" 
-      hight = "100vh" 
-      display = "flex" 
-      flexDirection = "column" 
-      justifyContent = "center"
+      width="100vw" 
+      height="100vh" 
+      display="flex" 
+      flexDirection="column" 
+      justifyContent="center"
       alignItems="center"
+      bgcolor="#f4f4f9" // Light background for the whole page
     >
       <Stack
         direction={'column'}
-        width={'600px'}
-        height={'700px'}
-        border={'1px solid black'}
-        p={2}
-        spacing={2}
+        width={'1000px'}
+        height={'600px'}
+        borderRadius={4}
+        boxShadow={3} // Add shadow for depth
+        bgcolor="white"
+        p={3}
+        spacing={3}
       >
-        <Stack direction={'column'} spacing={2} flexGrow={1} overflow={'auto'} maxHeight={'100%'} >
+        <Stack 
+          direction={'column'} 
+          spacing={2} 
+          flexGrow={1} 
+          overflow={'auto'} 
+          maxHeight={'100%'}
+          p={2}
+          sx={{ 
+            backgroundColor: '#e9ecef', // Slightly darker background for messages area
+            borderRadius: 2,
+          }}
+        >
           {
-            messages.map((message, index)=>(
-              <Box key={index} display={'flex'} justifyContent={
-                message.role === 'assistant' ? 'flex-start': 'flex-end'
-              }>
-              <Box bgcolor={
-                message.role === 'assistant'
-                ? 'primary.main'
-                : 'secondary.main'
-              }
-              color = 'white'
-              borderRadius={16}
-              p={3}
-              >{message.content}</Box>
+            messages.map((message, index) => (
+              <Box 
+                key={index} 
+                display={'flex'} 
+                justifyContent={
+                  message.role === 'assistant' ? 'flex-start' : 'flex-end'
+                }
+                mb={1} // Margin bottom for spacing between messages
+              >
+                <Box 
+                  bgcolor={
+                    message.role === 'assistant' ? '#808080' : '#007bff'
+                  } 
+                  color='white'
+                  borderRadius={6}
+                  p={3}
+                  maxWidth={'70%'} // Limit the width of the message bubbles
+                >
+                  <ReactMarkdown>
+                    {message.content}
+                  </ReactMarkdown>
+                </Box>
               </Box>
-            ))}
+            ))
+          }
         </Stack>
         <Stack direction={'row'} spacing={2}>
           <TextField
-          label = 'Your Message'
-          fullWidth
-          value = {message}
-          onChange = {(e)=> setMessage(e.target.value)}
+            label='Your Message'
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            variant="outlined"
+            sx={{ bgcolor: 'white', borderRadius: 1 }}
           />
-          <Button variant="contained" onClick={sendMessage}>Send</Button>
+          <Button 
+            variant="contained" 
+            onClick={sendMessage}
+            sx={{ 
+              bgcolor: 'primary.main',
+              color: 'white',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+              }
+            }}
+          >
+            Send
+          </Button>
         </Stack>
       </Stack>
     </Box>
-
   )
 }
-  
