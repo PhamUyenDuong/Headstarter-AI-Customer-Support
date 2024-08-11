@@ -1,16 +1,34 @@
 'use client'
+import { useSession, signOut } from "next-auth/react"
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Image from "next/image";
-import React, {useState} from "react";
+import React from "react";
 import {Box, Button, Stack, TextField} from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [messages, setMessages] = useState([{
     role: 'assistant',
     content: `Hi, I'm Carl! I will be assisting you with any of your questions about our cars and dealership.`
-  },
-])
+  }])
   const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (!session) {
+    return null
+  }
 
   const sendMessage = async () => {
     setMessage('')  // Clear the input field
@@ -134,6 +152,20 @@ export default function Home() {
           </Button>
         </Stack>
       </Stack>
+      <Button 
+        variant="contained" 
+        onClick={() => signOut()}
+        sx={{ 
+          mt: 2,
+          bgcolor: 'secondary.main',
+          color: 'white',
+          '&:hover': {
+            bgcolor: 'secondary.dark',
+          }
+        }}
+      >
+        Sign Out
+      </Button>
     </Box>
   )
 }

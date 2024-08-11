@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../auth/[...nextauth]/route"
 
 const systemPrompt = `Role: You are an advanced AI customer support bot for a reputable car dealership website. Your primary goal is to provide friendly, efficient, and accurate assistance to visitors. You help users with a variety of inquiries, including but not limited to, car models, pricing, financing options, availability, service scheduling, and more.
 
