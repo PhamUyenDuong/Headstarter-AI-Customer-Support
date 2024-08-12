@@ -10,41 +10,40 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([{
+    role: 'assistant',
+    content: `Hi, I'm Carl! I will be assisting you with any of your questions about our cars and dealership.`,
+    feedback: null
+  }])
   const [message, setMessage] = useState('')
-  const [language, setLanguage] = useState('en') // Default language is English
-
-  const languageGreetings = {
-    en: "",
-    es: "",
-    fr: ""
-  }
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
-    } else if (session) {
-      const selectedLanguage = localStorage.getItem('language') || 'en'
-      setLanguage(selectedLanguage)
-
-      const initialMessage = languageGreetings[selectedLanguage] || languageGreetings['en']
-      setMessages([
-        { role: 'assistant', content: initialMessage, feedback: null },
-      ])
-
-      // Send prompt to use the selected language
-      sendMessage(`Please answer all questions in ${selectedLanguage}. Now please give a 1 sentence introduction to the user`, true)
     }
-  }, [status, session, router])
+  }, [status, router])
 
-  const sendMessage = async (prompt, isSystemMessage = false) => {
-    if (!isSystemMessage) {
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (!session) {
+    return null
+  }
+
+  const sendMessage = async (prompt, isFeedback = false) => {
+    if (!isFeedback) {
       setMessages((messages) => [
         ...messages,
         { role: 'user', content: prompt || message },
         { role: 'assistant', content: '', feedback: null },
       ])
       setMessage('')
+    } else {
+      setMessages((messages) => [
+        ...messages,
+        { role: 'assistant', content: '', feedback: null },
+      ])
     }
 
     const response = fetch('/api/chat', {
@@ -52,7 +51,7 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify([...messages, { role: isSystemMessage ? 'system' : 'user', content: prompt || message, language }]),
+      body: JSON.stringify([...messages, { role: isFeedback ? 'system' : 'user', content: prompt || message }]),
     }).then(async (res) => {
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -65,7 +64,6 @@ export default function Home() {
         const text = decoder.decode(value || new Uint8Array(), { stream: true })
         setMessages((messages) => {
           let lastMessage = messages[messages.length - 1]
-          if (!lastMessage) return messages
           let otherMessages = messages.slice(0, messages.length - 1)
           return [
             ...otherMessages,
@@ -84,13 +82,7 @@ export default function Home() {
       )
     )
     if (feedback === 'dislike') {
-      sendMessage("The user thinks your previous response could have been better. Please try again.", true)
-      .then(() => {
-        setMessages((messages) => [
-          ...messages,
-          { role: 'assistant', content: "Thank you for the feedback. I'll improve my responses.", feedback: null },
-        ])
-      })
+      sendMessage("The user thinks your previous response could have been better. Please try again.", true);
     }
   }
 

@@ -14,6 +14,12 @@ export default function Home() {
   const [message, setMessage] = useState('')
   const [language, setLanguage] = useState('en') // Default language is English
 
+  // const languageGreetings = {
+  //   en: "Hi, I'm Carl! I will be assisting you with any of your questions about our cars and dealership.",
+  //   es: "Hola, soy Carl! Estaré ayudándote con cualquiera de tus preguntas sobre nuestros coches y concesionarios.",
+  //   fr: "Salut, je suis Carl ! Je vous aiderai avec toutes vos questions sur nos voitures et notre concession."
+  // }
+
   const languageGreetings = {
     en: "",
     es: "",
@@ -84,13 +90,7 @@ export default function Home() {
       )
     )
     if (feedback === 'dislike') {
-      sendMessage("The user thinks your previous response could have been better. Please try again.", true)
-      .then(() => {
-        setMessages((messages) => [
-          ...messages,
-          { role: 'assistant', content: "Thank you for the feedback. I'll improve my responses.", feedback: null },
-        ])
-      })
+      sendMessage("The user thinks your previous response could have been better. Please try again.", true);
     }
   }
 

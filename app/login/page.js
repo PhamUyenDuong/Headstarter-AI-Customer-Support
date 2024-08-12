@@ -18,7 +18,7 @@ export default function Login() {
       redirect: false,
     })
     if (result.ok) {
-      router.push('/')
+      router.push('/languages')
     } else {
       // Handle error
       alert('Login failed')
